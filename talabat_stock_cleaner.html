@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Cleaner — talabat</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --orange: #FF5900;
+    --orange-dark: #B34700;
+    --orange-light: #FF944D;
+    --orange-pale: #FFD1B3;
+    --cream: #F4EDE3;
+    --burgundy: #411517;
+    --lime: #CFFF00;
+    --white: #FFFFFF;
+    --gray: #595959;
+  }
+
+  body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background: var(--cream);
+    color: var(--burgundy);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--orange);
+    padding: 0 40px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(65,21,23,0.18);
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--cream);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--orange);
+    transform: rotate(4.7deg);
+    letter-spacing: -1px;
+  }
+
+  .logo-text {
+    color: var(--cream);
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-text span {
+    color: var(--lime);
+  }
+
+  .header-badge {
+    background: rgba(244,237,227,0.15);
+    color: var(--cream);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--burgundy);
+    padding: 56px 40px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 280px; height: 280px;
+    background: var(--orange);
+    opacity: 0.12;
+    border-radius: 50%;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 30%;
+    width: 180px; height: 180px;
+    background: var(--orange);
+    opacity: 0.08;
+    border-radius: 50%;
+  }
+
+  .hero-eyebrow {
+    color: var(--lime);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .hero h1 {
+    color: var(--cream);
+    font-size: 40px;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+
+  .hero h1 span {
+    color: var(--orange);
+  }
+
+  .hero-sub {
+    color: rgba(244,237,227,0.65);
+    font-size: 14px;
+    font-weight: 400;
+    margin-top: 10px;
+    max-width: 520px;
+  }
+
+  /* MAIN */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* STEP CARD */
+  .step-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 20px;
+    border: 1.5px solid rgba(255,89,0,0.10);
+    box-shadow: 0 2px 12px rgba(65,21,23,0.06);
+    transition: box-shadow 0.2s;
+  }
+
+  .step-card:hover {
+    box-shadow: 0 4px 24px rgba(255,89,0,0.10);
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .step-num {
+    width: 36px; height: 36px;
+    background: var(--orange);
+    color: var(--white);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .step-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--burgundy);
+  }
+
+  .step-desc {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--gray);
+    margin-top: 2px;
+  }
+
+  /* UPLOAD ZONES */
+  .upload-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 600px) { .upload-grid { grid-template-columns: 1fr; } }
+
+  .upload-zone {
+    border: 2px dashed rgba(255,89,0,0.3);
+    border-radius: 12px;
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--cream);
+    position: relative;
+  }
+
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: var(--orange);
+    background: rgba(255,89,0,0.04);
+  }
+
+  .upload-zone.done {
+    border-color: var(--orange);
+    border-style: solid;
+    background: rgba(255,89,0,0.05);
+  }
+
+  .upload-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .upload-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+
+  .upload-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--burgundy);
+    margin-bottom: 4px;
+  }
+
+  .upload-hint {
+    font-size: 11px;
+    color: var(--gray);
+  }
+
+  .upload-filename {
+    margin-top: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--orange);
+    background: rgba(255,89,0,0.08);
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+
+  /* EXCLUSIONS */
+  .exclusion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .exclusion-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--cream);
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .exclusion-item:hover {
+    border-color: var(--orange-light);
+  }
+
+  .exclusion-item.active {
+    background: rgba(255,89,0,0.08);
+    border-color: var(--orange);
+  }
+
+  .exclusion-item input[type="checkbox"] {
+    accent-color: var(--orange);
+    width: 16px; height: 16px;
+    flex-shrink: 0;
+  }
+
+  .exclusion-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--burgundy);
+  }
+
+  .exclusion-badge {
+    margin-left: auto;
+    font-size: 10px;
+    background: var(--orange-pale);
+    color: var(--orange-dark);
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 700;
+  }
+
+  /* NOTE */
+  .info-note {
+    background: rgba(255,89,0,0.07);
+    border-left: 3px solid var(--orange);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--burgundy);
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+
+  .info-note strong { color: var(--orange); }
+
+  /* PROCESS BUTTON */
+  .process-btn {
+    width: 100%;
+    padding: 18px;
+    background: var(--orange);
+    color: var(--white);
+    border: none;
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+    margin-top: 8px;
+  }
+
+  .process-btn:hover:not(:disabled) {
+    background: var(--orange-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(255,89,0,0.3);
+  }
+
+  .process-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  /* PROGRESS */
+  .progress-bar-wrap {
+    height: 6px;
+    background: rgba(255,89,0,0.12);
+    border-radius: 3px;
+    margin-top: 16px;
+    overflow: hidden;
+    display: none;
+  }
+
+  .progress-bar-wrap.visible { display: block; }
+
+  .progress-bar {
+    height: 100%;
+    background: var(--orange);
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  .progress-label {
+    font-size: 12px;
+    color: var(--gray);
+    margin-top: 8px;
+    display: none;
+    font-weight: 500;
+  }
+
+  .progress-label.visible { display: block; }
+
+  /* RESULTS */
+  .results-card {
+    background: var(--burgundy);
+    border-radius: 16px;
+    padding: 32px;
+    margin-top: 20px;
+    display: none;
+    color: var(--cream);
+  }
+
+  .results-card.visible { display: block; }
+
+  .results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .results-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--cream);
+  }
+
+  .results-title span { color: var(--lime); }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-box {
+    background: rgba(244,237,227,0.08);
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid rgba(244,237,227,0.12);
+  }
+
+  .stat-value {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--orange);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: rgba(244,237,227,0.6);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: var(--lime);
+    color: var(--burgundy);
+    border: none;
+    border-radius: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .download-btn:hover {
+    background: #b8e600;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(207,255,0,0.3);
+  }
+
+  /* ERROR */
+  .error-msg {
+    background: rgba(255,89,0,0.12);
+    border: 1px solid rgba(255,89,0,0.3);
+    border-radius: 10px;
+    padding: 14px 18px;
+    color: var(--orange-dark);
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 16px;
+    display: none;
+  }
+
+  .error-msg.visible { display: block; }
+
+  /* FOOTER */
+  footer {
+    background: var(--burgundy);
+    color: rgba(244,237,227,0.4);
+    text-align: center;
+    padding: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+
+  footer span { color: var(--orange); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <div class="logo-icon">t</div>
+    <div class="logo-text">talabat <span>WMS</span></div>
+  </div>
+  <div class="header-badge">Stock Cleaner</div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">Warehouse Management</div>
+  <h1>Clean <span>Available</span><br>Stock Report</h1>
+  <p class="hero-sub">Upload your On Hand and Physical Inventory files. Select the locations to exclude, and download a clean net available stock ready for order planning.</p>
+</div>
+
+<main>
+
+  <!-- STEP 1 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Upload Your Files</div>
+        <div class="step-desc">Both files must be .xlsx format exported from your WMS</div>
+      </div>
+    </div>
+    <div class="upload-grid">
+      <div class="upload-zone" id="zone-onhand">
+        <input type="file" id="file-onhand" accept=".xlsx,.xls" />
+        <div class="upload-icon">📋</div>
+        <div class="upload-label">On Hand List</div>
+        <div class="upload-hint">Available physical per item</div>
+        <div class="upload-filename" id="name-onhand" style="display:none"></div>
+      </div>
+      <div class="upload-zone" id="zone-physical">
+        <input type="file" id="file-physical" accept=".xlsx,.xls" />
+        <div class="upload-icon">📦</div>
+        <div class="upload-label">Physical Inventory</div>
+        <div class="upload-hint">Detailed per location breakdown</div>
+        <div class="upload-filename" id="name-physical" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Select Locations to Exclude</div>
+        <div class="step-desc">Only "Available" inventory in these locations will be deducted</div>
+      </div>
+    </div>
+    <div class="exclusion-grid">
+      <label class="exclusion-item active" onclick="toggleEx(this)">
+        <input type="checkbox" value="Dock 01|Dock 01 :0" checked />
+        <span class="exclusion-label">Dock</span>
+        <span class="exclusion-badge">2 locs</span>
+      </label>
+      <label class="exclusion-item active" onclick="toggleEx(this)">
+        <input type="checkbox" value="V-D" checked />
+        <span class="exclusion-label">V-D</span>
+        <span class="exclusion-badge">Virtual Dmg</span>
+      </label>
+      <label class="exclusion-item active" onclick="toggleEx(this)">
+        <input type="checkbox" value="H-D" checked />
+        <span class="exclusion-label">H-D</span>
+        <span class="exclusion-badge">Hold Dmg</span>
+      </label>
+      <label class="exclusion-item active" onclick="toggleEx(this)">
+        <input type="checkbox" value="MOQ" checked />
+        <span class="exclusion-label">MOQ (all)</span>
+        <span class="exclusion-badge">Pattern</span>
+      </label>
+      <label class="exclusion-item active" onclick="toggleEx(this)">
+        <input type="checkbox" value="Truck 01" checked />
+        <span class="exclusion-label">Truck 01</span>
+        <span class="exclusion-badge">On Truck</span>
+      </label>
+      <label class="exclusion-item active" onclick="toggleEx(this)">
+        <input type="checkbox" value="D.damage" checked />
+        <span class="exclusion-label">D.damage</span>
+        <span class="exclusion-badge">Damage</span>
+      </label>
+      <label class="exclusion-item active" style="border-color: var(--orange); background: rgba(255,89,0,0.08);">
+        <input type="checkbox" checked disabled />
+        <span class="exclusion-label">All Damaged</span>
+        <span class="exclusion-badge">Always On</span>
+      </label>
+    </div>
+    <div class="info-note">
+      <strong>Note:</strong> Picker names are not excluded — they are already reserved by the system. All <strong>Damaged</strong> inventory is always deducted regardless of location.
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Generate Clean Stock Report</div>
+        <div class="step-desc">Processing happens in your browser — no data leaves your device</div>
+      </div>
+    </div>
+
+    <button class="process-btn" id="process-btn" onclick="processFiles()" disabled>
+      🔄 Process & Download
+    </button>
+
+    <div class="progress-bar-wrap" id="progress-wrap">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div class="progress-label" id="progress-label"></div>
+    <div class="error-msg" id="error-msg"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-card" id="results-card">
+    <div class="results-header">
+      <div class="results-title">Report <span>Ready</span> ✓</div>
+      <button class="download-btn" id="download-btn">⬇ Download Excel</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-value" id="stat-total">—</div>
+        <div class="stat-label">Total Items</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="stat-affected">—</div>
+        <div class="stat-label">Items Adjusted</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="stat-deducted">—</div>
+        <div class="stat-label">Units Excluded</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="stat-locs">—</div>
+        <div class="stat-label">Locations Scanned</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  talabat WMS Tools &nbsp;·&nbsp; Stock Cleaner &nbsp;·&nbsp; Built for <span>Warehouse Operations</span>
+</footer>
+
+<script>
+  let onHandData = null;
+  let physicalData = null;
+  let outputBlob = null;
+
+  function setProgress(pct, label) {
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = label;
+    document.getElementById('progress-wrap').classList.add('visible');
+    document.getElementById('progress-label').classList.add('visible');
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('error-msg');
+    el.textContent = msg;
+    el.classList.add('visible');
+  }
+
+  function clearError() {
+    document.getElementById('error-msg').classList.remove('visible');
+  }
+
+  function toggleEx(label) {
+    const cb = label.querySelector('input[type="checkbox"]');
+    cb.checked = !cb.checked;
+    label.classList.toggle('active', cb.checked);
+  }
+
+  function checkReady() {
+    document.getElementById('process-btn').disabled = !(onHandData && physicalData);
+  }
+
+  function readFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const wb = XLSX.read(e.target.result, { type: 'array' });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          const json = XLSX.utils.sheet_to_json(ws);
+          resolve(json);
+        } catch(err) { reject(err); }
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  document.getElementById('file-onhand').addEventListener('change', async function() {
+    if (!this.files[0]) return;
+    try {
+      onHandData = await readFile(this.files[0]);
+      document.getElementById('name-onhand').textContent = '✓ ' + this.files[0].name;
+      document.getElementById('name-onhand').style.display = 'inline-block';
+      document.getElementById('zone-onhand').classList.add('done');
+      checkReady();
+    } catch(e) { showError('Could not read On Hand file. Make sure it is a valid .xlsx file.'); }
+  });
+
+  document.getElementById('file-physical').addEventListener('change', async function() {
+    if (!this.files[0]) return;
+    try {
+      physicalData = await readFile(this.files[0]);
+      document.getElementById('name-physical').textContent = '✓ ' + this.files[0].name;
+      document.getElementById('name-physical').style.display = 'inline-block';
+      document.getElementById('zone-physical').classList.add('done');
+      checkReady();
+    } catch(e) { showError('Could not read Physical file. Make sure it is a valid .xlsx file.'); }
+  });
+
+  // Drag and drop
+  ['zone-onhand', 'zone-physical'].forEach(id => {
+    const zone = document.getElementById(id);
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const inputId = id === 'zone-onhand' ? 'file-onhand' : 'file-physical';
+      const input = document.getElementById(inputId);
+      if (e.dataTransfer.files[0]) {
+        const dt = new DataTransfer();
+        dt.items.add(e.dataTransfer.files[0]);
+        input.files = dt.files;
+        input.dispatchEvent(new Event('change'));
+      }
+    });
+  });
+
+
+  function getLocType(loc) {
+    const l = loc.toLowerCase();
+    if (l.startsWith('dock')) return 'Dock';
+    if (l === 'v-d') return 'V-D';
+    if (l === 'h-d') return 'H-D';
+    if (l.startsWith('moq')) return 'MOQ';
+    if (l === 'truck 01') return 'Truck';
+    if (l === 'd.damage') return 'Damage';
+    return 'Other';
+  }
+
+  async function processFiles() {
+    clearError();
+    outputBlob = null;
+    document.getElementById('results-card').classList.remove('visible');
+    document.getElementById('process-btn').disabled = true;
+
+    try {
+      setProgress(10, 'Reading files...');
+      await new Promise(r => setTimeout(r, 50));
+
+      // Detect column names
+      const ohSample = onHandData[0] || {};
+      const phSample = physicalData[0] || {};
+
+      // Normalize: trim + lowercase for matching
+      const normalize = s => String(s).trim().toLowerCase().replace(/\s+/g, ' ');
+      const ohKeys = Object.keys(ohSample);
+      const phKeys = Object.keys(phSample);
+
+      const ohItemCol = ohKeys.find(k => normalize(k).includes('item') && normalize(k).includes('number'))
+                     || ohKeys.find(k => normalize(k).includes('item'))
+                     || ohKeys[0];
+
+      const ohAvailCol = ohKeys.find(k => normalize(k).includes('available physical'))
+                      || ohKeys.find(k => normalize(k).startsWith('available'))
+                      || ohKeys.find(k => normalize(k).includes('avail'));
+
+      const phItemCol = phKeys.find(k => normalize(k).includes('item') && normalize(k).includes('number'))
+                     || phKeys.find(k => normalize(k).includes('item'))
+                     || phKeys[0];
+
+      const phLocCol = phKeys.find(k => normalize(k).includes('location'))
+                    || phKeys.find(k => normalize(k) === 'loc');
+
+      const phStatusCol = phKeys.find(k => normalize(k).includes('inventory status'))
+                       || phKeys.find(k => normalize(k).includes('status'));
+
+      const phQtyCol = phKeys.find(k => normalize(k).includes('physical inventory'))
+                    || phKeys.find(k => normalize(k).includes('physical'))
+                    || phKeys.find(k => normalize(k).includes('quantity'))
+                    || phKeys.find(k => normalize(k).includes('qty'));
+
+      if (!ohItemCol || !ohAvailCol) {
+        showError('Could not detect columns in On Hand file.\nFound columns: ' + ohKeys.join(', '));
+        document.getElementById('process-btn').disabled = false; return;
+      }
+      if (!phItemCol || !phLocCol || !phStatusCol || !phQtyCol) {
+        showError('Could not detect columns in Physical file.\nFound columns: ' + phKeys.join(', '));
+        document.getElementById('process-btn').disabled = false; return;
+      }
+
+      setProgress(25, 'Building exclusion list...');
+      await new Promise(r => setTimeout(r, 50));
+
+      // Build exclusion location set
+      const checkedBoxes = document.querySelectorAll('.exclusion-item input[type="checkbox"]:checked');
+      const excludePatterns = [];
+      const excludeExact = new Set();
+
+      checkedBoxes.forEach(cb => {
+        const vals = cb.value.split('|');
+        vals.forEach(v => {
+          if (v === 'MOQ') excludePatterns.push('moq');
+          else excludeExact.add(v.trim());
+        });
+      });
+
+      // Collect all unique locations in physical
+      const allLocs = [...new Set(physicalData.map(r => String(r[phLocCol] || '')))];
+
+      // MOQ pattern match
+      const moqLocs = excludePatterns.includes('moq')
+        ? allLocs.filter(l => l.toLowerCase().startsWith('moq'))
+        : [];
+      moqLocs.forEach(l => excludeExact.add(l));
+
+      setProgress(45, 'Calculating excluded quantities...');
+      await new Promise(r => setTimeout(r, 50));
+
+      // Sum excluded qty per item:
+      // 1) Available in excluded locations
+      // 2) ALL Damaged regardless of location
+      const excludedMap = {};
+      const damagedMap = {};
+      let totalExcludedQty = 0;
+      let affectedItems = new Set();
+
+      physicalData.forEach(row => {
+        const loc = String(row[phLocCol] || '');
+        const status = String(row[phStatusCol] || '');
+        const item = String(row[phItemCol] || '');
+        const qty = parseFloat(row[phQtyCol]) || 0;
+
+        // Excluded locations (Available only)
+        if (excludeExact.has(loc) && status.toLowerCase() === 'available') {
+          excludedMap[item] = (excludedMap[item] || 0) + qty;
+          totalExcludedQty += qty;
+          affectedItems.add(item);
+        }
+
+        // All Damaged regardless of location
+        if (status.toLowerCase() === 'damaged') {
+          damagedMap[item] = (damagedMap[item] || 0) + qty;
+          totalExcludedQty += qty;
+          affectedItems.add(item);
+        }
+      });
+
+      // Merge both into excludedMap
+      Object.keys(damagedMap).forEach(item => {
+        excludedMap[item] = (excludedMap[item] || 0) + damagedMap[item];
+      });
+
+      setProgress(70, 'Merging with on hand stock...');
+      await new Promise(r => setTimeout(r, 50));
+
+      // Build result
+      const result = onHandData.map(row => {
+        const item = String(row[ohItemCol] || '');
+        const avail = parseFloat(row[ohAvailCol]) || 0;
+        const excl = excludedMap[item] || 0;
+        return {
+          ...row,
+          'Excluded Qty': excl,
+          'Net Available': avail - excl
+        };
+      });
+
+      setProgress(88, 'Generating Excel file...');
+      await new Promise(r => setTimeout(r, 50));
+
+      // Build XLSX
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(result);
+
+      // Style header row (orange background)
+      const range = XLSX.utils.decode_range(ws['!ref']);
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const addr = XLSX.utils.encode_cell({ r: 0, c: C });
+        if (!ws[addr]) continue;
+        ws[addr].s = {
+          fill: { fgColor: { rgb: 'FF5900' } },
+          font: { bold: true, color: { rgb: 'FFFFFF' } }
+        };
+      }
+
+      // Column widths
+      ws['!cols'] = Array(Object.keys(result[0]).length).fill({ wch: 22 });
+
+      XLSX.utils.book_append_sheet(wb, ws, 'Net Available Stock');
+
+      // Build Sheet 2: Exclusion Detail
+      // For each item that had exclusions, show breakdown per location
+      const detailRows = [];
+      physicalData.forEach(row => {
+        const loc = String(row[phLocCol] || '');
+        const status = String(row[phStatusCol] || '');
+        const item = String(row[phItemCol] || '');
+        const qty = parseFloat(row[phQtyCol]) || 0;
+        if (qty === 0) return;
+
+        const isExcludedLoc = excludeExact.has(loc) && status.toLowerCase() === 'available';
+        const isDamaged = status.toLowerCase() === 'damaged';
+        if (!isExcludedLoc && !isDamaged) return;
+
+        // Get product name from on hand
+        const ohRow = onHandData.find(r => String(r[ohItemCol]) === item);
+        const productName = ohRow ? (ohRow['Product name'] || ohRow[Object.keys(ohRow)[1]] || '') : '';
+        const originalAvail = ohRow ? (parseFloat(ohRow[ohAvailCol]) || 0) : 0;
+
+        detailRows.push({
+          'Item Number': item,
+          'Product Name': productName,
+          'Excluded Location': loc,
+          'Location Type': isDamaged ? 'Damaged' : getLocType(loc),
+          'Excluded Qty': qty,
+          'Original Available': originalAvail,
+          'Net Available': originalAvail - (excludedMap[item] || 0)
+        });
+      });
+
+      // Sort by item then location
+      detailRows.sort((a, b) => a['Item Number'].localeCompare(b['Item Number']));
+
+      const ws2 = XLSX.utils.json_to_sheet(detailRows);
+      ws2['!cols'] = [
+        { wch: 16 }, { wch: 38 }, { wch: 20 }, { wch: 16 },
+        { wch: 16 }, { wch: 18 }, { wch: 16 }
+      ];
+      // Style header
+      const range2 = XLSX.utils.decode_range(ws2['!ref'] || 'A1');
+      for (let C = range2.s.c; C <= range2.e.c; ++C) {
+        const addr = XLSX.utils.encode_cell({ r: 0, c: C });
+        if (!ws2[addr]) continue;
+        ws2[addr].s = {
+          fill: { fgColor: { rgb: '411517' } },
+          font: { bold: true, color: { rgb: 'FF5900' } }
+        };
+      }
+      XLSX.utils.book_append_sheet(wb, ws2, 'Exclusion Detail');
+
+      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+      outputBlob = wbout;
+
+      setProgress(100, 'Done!');
+
+      // Stats
+      document.getElementById('stat-total').textContent = result.length.toLocaleString();
+      document.getElementById('stat-affected').textContent = affectedItems.size.toLocaleString();
+      document.getElementById('stat-deducted').textContent = totalExcludedQty.toLocaleString();
+      document.getElementById('stat-locs').textContent = allLocs.length.toLocaleString();
+
+      document.getElementById('results-card').classList.add('visible');
+
+      // Download button
+      document.getElementById('download-btn').onclick = () => {
+        const a = document.createElement('a');
+        a.href = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' + outputBlob;
+        a.download = 'talabat_net_available_stock.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      };
+
+    } catch(e) {
+      showError('An error occurred: ' + e.message);
+    }
+
+    document.getElementById('process-btn').disabled = false;
+  }
+</script>
+</body>
+</html>
