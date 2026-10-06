@@ -586,6 +586,36 @@
         <span class="exclusion-label">D.damage</span>
         <span class="exclusion-badge">Damage</span>
       </label>
+      <label class="exclusion-item active" onclick="toggleEx(this)">
+        <input type="checkbox" value="1000G" checked />
+        <span class="exclusion-label">1000G</span>
+        <span class="exclusion-badge">1000G</span>
+      </label>
+      <label class="exclusion-item active" onclick="toggleEx(this)">
+        <input type="checkbox" value="4000G" checked />
+        <span class="exclusion-label">4000G</span>
+        <span class="exclusion-badge">4000G</span>
+      </label>
+      <label class="exclusion-item active" onclick="toggleEx(this)">
+        <input type="checkbox" value="EX-R01-A" checked />
+        <span class="exclusion-label">EX-R01-A</span>
+        <span class="exclusion-badge">EX-R01-A</span>
+      </label>
+      <label class="exclusion-item active" onclick="toggleEx(this)">
+        <input type="checkbox" value="M-50" checked />
+        <span class="exclusion-label">M-50</span>
+        <span class="exclusion-badge">M-50</span>
+      </label>
+      <label class="exclusion-item active" onclick="toggleEx(this)">
+        <input type="checkbox" value="PS" checked />
+        <span class="exclusion-label">PS</span>
+        <span class="exclusion-badge">PS</span>
+      </label>
+      <label class="exclusion-item active" onclick="toggleEx(this)">
+        <input type="checkbox" value="Sold-off" checked />
+        <span class="exclusion-label">Sold-off</span>
+        <span class="exclusion-badge">Sold-off</span>
+      </label>
       <label class="exclusion-item active" style="border-color: var(--orange); background: rgba(255,89,0,0.08);">
         <input type="checkbox" checked disabled />
         <span class="exclusion-label">All Damaged</span>
@@ -748,6 +778,12 @@
     if (l.startsWith('moq')) return 'MOQ';
     if (l === 'truck 01') return 'Truck';
     if (l === 'd.damage') return 'Damage';
+    if (l === '1000g') return '1000G';
+    if (l === '4000g') return '4000G';
+    if (l === 'ex-r01-a') return 'EX-R01-A';
+    if (l === 'm-50') return 'M-50';
+    if (l === 'ps') return 'PS';
+    if (l === 'sold-off') return 'Sold-off';
     return 'Other';
   }
 
